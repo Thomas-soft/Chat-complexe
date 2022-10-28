@@ -8,7 +8,13 @@ HOST, PORT = "localhost", 8989
 FORMAT = "UTF-8"
 
 socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-socket.bind((HOST, PORT))
+try:
+    socket.bind((HOST, PORT))
+except OSError:
+    print("Error: Server already ON.")
+    socket.close()
+    quit()
+
 socket.listen()
 
 os.system("cls")
@@ -210,10 +216,11 @@ def admin():
 
         elif user_input == f"3 {user_input[2:]}":
             for i in sessions:
-                if i[1][0] == user_input[2:]:
-                    i[1][1].send("Server: Disconnected by admin!".encode(FORMAT))
-                    i[1][1].close()
-                    print(f"> {i[1][1]} is banned! <")
+                for j in i[1:]:
+                    if j[0] == user_input[2:]:
+                        j[1].send("Server: Disconnected by admin!".encode(FORMAT))
+                        j[1].close()
+                        print(f"> {j[0]} is banned! <")
 
         elif user_input == '4':
             for i in sessions:
@@ -221,7 +228,8 @@ def admin():
                     print(j[0])
         
         elif user_input == '5':
-            print(sessions)
+            for i in sessions[1:]:
+                print(i[0][0])
 
 
     socket.close()
